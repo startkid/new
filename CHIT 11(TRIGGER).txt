@@ -1,0 +1,43 @@
+-- Create borrower table
+CREATE TABLE borrower (
+    Rollin INT PRIMARY KEY,
+    name VARCHAR2(30),
+    dateofissue DATE,
+    nameofbook VARCHAR2(30),
+    status CHAR(10)
+);
+
+-- Create Library_Audit table
+CREATE TABLE Library_Audit (
+    Rollin INT,
+    name CHAR(10),
+    dateofissue DATE,
+    nameofbook CHAR(10),
+    status CHAR(10),
+    ts TIMESTAMP
+);
+INSERT INTO borrower (Rollin, name, dateofissue, nameofbook, status)
+VALUES (101, 'John Doe', TO_DATE('2024-11-01', 'YYYY-MM-DD'), 'Book1', 'I');
+
+-- Drop the existing trigger if it exists
+DROP TRIGGER trg_after_update_delete_borrower;
+
+-- Create the trigger
+CREATE OR REPLACE TRIGGER trg_after_update_delete_borrower
+AFTER UPDATE OR DELETE ON borrower
+FOR EACH ROW
+BEGIN
+    -- Insert old values into Library_Audit on update or delete
+    INSERT INTO Library_Audit (Rollin, name, dateofissue, nameofbook, status, ts)
+    VALUES (:OLD.Rollin, :OLD.name, :OLD.dateofissue, :OLD.nameofbook, :OLD.status, CURRENT_TIMESTAMP);
+END;
+/
+UPDATE borrower
+SET nameofbook = 'Book2', status = 'R'
+WHERE Rollin = 101;
+
+DELETE FROM borrower
+WHERE Rollin = 101;
+
+SELECT * FROM Library_Audit;
+

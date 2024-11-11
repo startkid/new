@@ -1,0 +1,57 @@
+CHTI 3 : 
+create table dept( 
+deptid int primary key, 
+deptname varchar(10) 
+); 
+
+create table emp( 
+empid int primary key, 
+empname varchar(10), 
+empsal int, 
+empdeptid int, 
+foreign key (empdeptid) references dept(deptid) 
+); 
+
+alter table emp 
+modify empname varchar(10) not null; 
+describe emp; 
+
+
+insert into dept(deptid,deptname) 
+values(1, 'hr'); 
+insert into dept(deptid,deptname) 
+values(2, 'finance'); 
+alter table dept 
+modify deptname varchar(20); 
+insert into dept(deptid,deptname) 
+values(3, 'engineering'); 
+
+
+insert into emp(empid, empname, empsal,empdeptid) 
+values (101, 'Alice', 50000, 1); 
+insert into emp(empid, empname, empsal,empdeptid) 
+values (102, 'Bob', 60000, 2); 
+insert into emp(empid, empname, empsal,empdeptid) 
+values (103, 'Charlie', 55000, 3); 
+
+select * from dept; 
+select * from emp; 
+
+alter table dept 
+add deptloc varchar(10); 
+alter table dept 
+add constraint unique_deptloc unique(deptloc); 
+describe dept; 
+update dept 
+set deptloc='New York' 
+where deptid=1; 
+update dept 
+set deptloc='London' 
+where deptid=2; 
+update dept 
+set deptloc='China' 
+where deptid=3; 
+ 
+ 
+ 
+ 

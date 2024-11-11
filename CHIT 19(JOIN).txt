@@ -1,0 +1,58 @@
+CHIT 19(JOIN)
+
+-- Step 1: Create Tables
+CREATE TABLE customer (
+    customer_id INTEGER PRIMARY KEY,
+    first_name TEXT
+);
+
+CREATE TABLE orders (
+    order_id INTEGER PRIMARY KEY,
+    amount REAL,
+    customer_id INTEGER,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+);
+
+-- Step 2: Insert Sample Data
+INSERT INTO customer (customer_id, first_name) VALUES (1, 'Alice');
+INSERT INTO customer (customer_id, first_name) VALUES (2, 'Bob');
+INSERT INTO customer (customer_id, first_name) VALUES (3, 'Charlie');
+
+INSERT INTO orders (order_id, amount, customer_id) VALUES (101, 250.0, 1);
+INSERT INTO orders (order_id, amount, customer_id) VALUES (102, 300.0, 2);
+INSERT INTO orders (order_id, amount, customer_id) VALUES (103, 150.0, 1);
+INSERT INTO orders (order_id, amount, customer_id) VALUES (104, 400.0, NULL);
+
+-- Step 3: JOIN Queries
+
+-- INNER JOIN
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM customer c
+INNER JOIN orders o ON c.customer_id = o.customer_id;
+
+-- LEFT JOIN
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM customer c
+LEFT JOIN orders o ON c.customer_id = o.customer_id;
+
+-- Simulate RIGHT JOIN using LEFT JOIN with UNION
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM customer c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+
+UNION
+
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM orders o
+LEFT JOIN customer c ON o.customer_id = c.customer_id;
+
+-- Simulate FULL OUTER JOIN using two LEFT JOINs with UNION
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM customer c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+
+UNION
+
+SELECT c.customer_id, c.first_name, o.order_id, o.amount
+FROM orders o
+LEFT JOIN customer c ON o.customer_id = c.customer_id;

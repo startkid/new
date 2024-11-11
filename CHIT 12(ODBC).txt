@@ -1,0 +1,51 @@
+// CHIT 12(ODBC)
+
+package sample;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class OracleConnectivity {
+    public static void main(String[] args) {
+        // Database URL: "jdbc:oracle:thin:@<host>:<port>:<SID>"
+        String url = "jdbc:oracle:thin:@localhost:1521:xe"; // Example for Oracle XE
+        String username = "your_username"; // Replace with your DB username
+        String password = "your_password"; // Replace with your DB password
+
+        Connection connection = null;
+
+        try {
+            // Load Oracle JDBC Driver
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            System.out.println("Oracle JDBC Driver Loaded!");
+
+            // Establish connection
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Connected to Oracle Database!");
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Oracle JDBC Driver not found!");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Connection failed!");
+            e.printStackTrace();
+        } finally {
+            // Close the connection
+            if (connection != null) {
+                try {
+                    connection.close();
+                    System.out.println("Connection closed!");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+<dependency>
+    <groupId>com.oracle.database.jdbc</groupId>
+    <artifactId>ojdbc8</artifactId>
+    <version>19.18.0.0</version> <!-- Replace with your version -->
+</dependency>

@@ -1,0 +1,27 @@
+use myDatabase  # Use or create the database
+db.createCollection("Student")  # Create the collection
+
+db.Student.insertMany([
+    { stud_id: 1, stud_name: "John", dept_name: "Computer", marks: 85 },
+    { stud_id: 2, stud_name: "Alice", dept_name: "Electrical", marks: 75 },
+    { stud_id: 3, stud_name: "Bob", dept_name: "Civil", marks: 45 },
+    { stud_id: 4, stud_name: "Charlie", dept_name: "Chemical", marks: 20 },
+    { stud_id: 5, stud_name: "Eve", dept_name: "Computer", marks: 65 },
+    { stud_id: 6, stud_name: "David", dept_name: "Civil", marks: 30 },
+    { stud_id: 7, stud_name: "Mallory", dept_name: "Chemical", marks: 25 },
+    { stud_id: 8, stud_name: "Oscar", dept_name: "Computer", marks: 95 }
+])
+
+db.Student.find({ marks: { $gt: 50 } })
+
+db.Student.find({ marks: { $gte: 50, $lte: 80 } })
+
+db.Student.find({ dept_name: "Computer", marks: { $gt: 60 } })
+
+db.Student.updateMany(
+    { dept_name: "Civil" },  // Filter: Civil department
+    { $set: { marks: 30 } }  // Update: Set marks to 30
+)
+
+db.Student.deleteMany({ dept_name: "Chemical", marks: { $lt: 30 } })
+

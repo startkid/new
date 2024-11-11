@@ -1,0 +1,61 @@
+CHIT  4
+
+--CHIT 4
+-- Emp (empId int, empName varchar (10), empSal int, empDeptId int) 
+-- Dept(deptId int, deptName varchar(10)) 
+-- 1. Insert few Record. 
+-- 2. List employees belonging to department 30, 40, or 10 
+-- 3. List the employee details whose salary is between 10000 to 30000. 
+-- 4. List total no of employee. 
+-- 5. List average sal of each deptID. 
+-- 6. List employee details in ascending order of salary. 
+
+-- Create Dept table
+CREATE TABLE Dept (
+    deptId INT PRIMARY KEY,
+    deptName VARCHAR(10)
+);
+
+-- Create Emp table with empDeptId as a foreign key referencing Dept table
+CREATE TABLE Emp (
+    empId INT PRIMARY KEY,
+    empName VARCHAR(10),
+    empSal INT,
+    empDeptId INT,
+    FOREIGN KEY (empDeptId) REFERENCES Dept(deptId)
+);
+
+-- Insert records into Dept table
+INSERT INTO Dept (deptId, deptName) VALUES 
+(10, 'HR'), 
+(20, 'Finance'), 
+(30, 'IT'), 
+(40, 'Marketing');
+
+-- Insert records into Emp table
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES 
+(101, 'Alice', 15000, 10),
+(102, 'Bob', 25000, 30),
+(103, 'Charlie', 30000, 40),
+(104, 'Diana', 20000, 30),
+(105, 'Eve', 12000, 20);
+
+-- List employees belonging to department 30, 40, or 10
+SELECT * FROM Emp
+WHERE empDeptId IN (30, 40, 10);
+
+-- List employee details whose salary is between 10000 and 30000
+SELECT * FROM Emp
+WHERE empSal BETWEEN 10000 AND 30000;
+
+-- List total number of employees
+SELECT COUNT(*) AS total_employees FROM Emp;
+
+-- List average salary of each department
+SELECT empDeptId, AVG(empSal) AS average_salary
+FROM Emp
+GROUP BY empDeptId;
+
+-- List employee details in ascending order of salary
+SELECT * FROM Emp
+ORDER BY empSal ASC;

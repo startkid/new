@@ -1,0 +1,32 @@
+use myDatabase  # Switch to your database (replace 'myDatabase' with your desired database name)
+
+
+db.Book.insertMany([
+    { Title: "MongoDB Basics", Description: "Introduction to MongoDB", Author: "John Doe", Publisher: "TechBooks", URL: "http://example.com/mongodb-basics", no_of_likes: 150 },
+    { Title: "Advanced MongoDB", Description: "In-depth MongoDB topics", Author: "Jane Smith", Publisher: "TechBooks", URL: "http://example.com/advanced-mongodb", no_of_likes: 200 },
+    { Title: "MongoDB for Dummies", Description: "MongoDB for beginners", Author: "John Doe", Publisher: "Learning Publishers", URL: "http://example.com/mongodb-for-dummies", no_of_likes: 300 },
+    { Title: "Node.js and MongoDB", Description: "Integration of Node.js with MongoDB", Author: "Jane Smith", Publisher: "Web Dev Publishing", URL: "http://example.com/node-mongodb", no_of_likes: 180 },
+    { Title: "NoSQL Databases", Description: "All about NoSQL databases", Author: "John Doe", Publisher: "DB Publishing", URL: "http://example.com/nosql-databases", no_of_likes: 250 }
+])
+
+db.Book.find()
+
+
+db.Book.aggregate([
+    { $group: { _id: "$Publisher", bookCount: { $sum: 1 } } }
+])
+
+
+db.Book.aggregate([
+    { $group: { _id: "$Author", minLikes: { $min: "$no_of_likes" } } }
+])
+
+
+db.Book.aggregate([
+    { $group: { _id: "$Author", maxLikes: { $max: "$no_of_likes" } } }
+])
+
+
+
+
+

@@ -1,0 +1,71 @@
+// CHIT 2 : DML
+
+--CHIT 2
+-- Problem Statement: Design following SQL DML statements:  
+-- Create a university/college database containing following tables-  
+-- Student (stud_id, deptnm, sem, name, yr, credits) 
+-- Teaches (teacher_id, teacher_name, salary, deptnm) 
+-- 1. Insert records into all tables. 
+-- 2. Update record on student tables as department name comp to IT. 
+-- 3. Find the department that has highest or average salary 
+-- 4. Delete the records of all teacher with salary below 2000. 
+-- 5. Find the sum of salary of each department.
+
+
+-- Create Student table
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    deptnm VARCHAR(50),
+    sem INT,
+    name VARCHAR(100),
+    yr INT,
+    credits INT
+);
+
+-- Create Teaches table
+CREATE TABLE Teaches (
+    teacher_id INT PRIMARY KEY,
+    teacher_name VARCHAR(100),
+    salary DECIMAL(10, 2),
+    deptnm VARCHAR(50)
+);
+
+insert into student(stud_id,deptnm,sem,name,yr,credits) 
+values(1, 'comp', 3, 'Alice Johnson', 2023, 15); 
+insert into student(stud_id,deptnm,sem,name,yr,credits) 
+values(2, 'IT', 2, 'Bob Smith', 2024, 12); 
+insert into student(stud_id,deptnm,sem,name,yr,credits) 
+values(3, 'comp', 4, 'Carol Davis', 2022,18); 
+select * from student;
+
+insert into teaches(teacher_id, teacher_name, salary, deptnm) 
+values(101, 'Dr. Sarah Lee', 3000.00, 'comp'); 
+insert into teaches(teacher_id, teacher_name, salary, deptnm) 
+values(102, 'Prof. Mark Brown', 2500.00, 'IT'); 
+insert into teaches(teacher_id, teacher_name, salary, deptnm) 
+values(103, 'Dr. Emily Clark', 1900.00, 'math'); 
+insert into teaches(teacher_id, teacher_name, salary, deptnm) 
+values(104, 'Dr. Aditi', 2900.00, 'comp'); 
+
+select * from teaches; 
+
+update student 
+set deptnm='IT' 
+where deptnm='comp'; 
+
+
+select * from student; 
+
+
+SELECT deptnm, AVG(salary) AS avg_salary
+FROM Teaches
+GROUP BY deptnm
+ORDER BY avg_salary DESC;
+
+
+DELETE FROM Teaches
+WHERE salary < 2000;
+
+SELECT deptnm,SUM(salary)
+FROM Teaches
+Group by deptnm;

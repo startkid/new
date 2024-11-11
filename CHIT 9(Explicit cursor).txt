@@ -1,0 +1,37 @@
+CHIT 9
+
+CREATE TABLE Stud ( 
+roll_number NUMBER(4), 
+att NUMBER(4), 
+status VARCHAR2(1) 
+); 
+CREATE TABLE d_stud ( 
+roll_number NUMBER(4), 
+att NUMBER(4) 
+); 
+INSERT INTO Stud (roll_number, att, status) VALUES (1001, 80, NULL); 
+INSERT INTO Stud (roll_number, att, status) VALUES (1002, 70, NULL); 
+INSERT INTO Stud (roll_number, att, status) VALUES (1003, 65, NULL); 
+INSERT INTO Stud (roll_number, att, status) VALUES (1004, 90, NULL); 
+INSERT INTO Stud (roll_number, att, status) VALUES (1005, 60, NULL); 
+select * from Stud; 
+DECLARE -- Cursor declaration to fetch students with attendance < 75% 
+CURSOR crsr_att IS  
+SELECT roll_number, att, status FROM Stud WHERE att < 75; -- Variables to hold fetched data 
+mroll Stud.roll_number%TYPE; 
+matt Stud.att%TYPE; 
+mstatus Stud.status%TYPE; 
+BEGIN -- Open the cursor to start fetching rows 
+OPEN crsr_att; -- Check if the cursor is open (optional in most cases) 
+IF crsr_att%ISOPEN THEN 
+LOOP -- Fetch each row into variables 
+FETCH crsr_att INTO mroll, matt, mstatus; 
+-- Exit the loop if there are no more rows 
+EXIT WHEN crsr_att%NOTFOUND; -- Update status to 'D' for detained 
+UPDATE Stud SET status = 'D' WHERE roll_number = mroll; -- Insert detained student details into d_stud table 
+INSERT INTO d_stud VALUES (mroll, matt); 
+END LOOP; 
+END IF; -- Commit the changes after the loop 
+COMMIT; 
+END; 
+select * from Stud; 

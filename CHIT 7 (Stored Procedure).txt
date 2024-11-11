@@ -1,0 +1,142 @@
+CHIT 7 (Stored Procedure)
+
+CREATE TABLE  borrower2( 
+roll_no NUMBER ,  
+name VARCHAR2(25),  
+dateofissue DATE, 
+name_of_book VARCHAR2(25), 
+status VARCHAR2(20) 
+); 
+CREATE TABLE fine1( 
+roll_no NUMBER, 
+date_of_return DATE, 
+amt NUMBER 
+); 
+INSERT INTO borrower2 (roll_no, name, dateofissue, name_of_book, status) 
+VALUES (1, 'Aditi', TO_DATE('01-08-2024', 'DD-MM-YYYY'), 'silent hill', 'pending'); 
+INSERT INTO borrower2 (roll_no, name, dateofissue, name_of_book, status) 
+VALUES (2, 'Bhavika', TO_DATE('15-08-2024', 'DD-MM-YYYY'), ' not silent hill', 'pending'); 
+INSERT INTO borrower2 (roll_no, name, dateofissue, name_of_book, status) 
+VALUES (3, 'Mitali', TO_DATE('24-08-2024', 'DD-MM-YYYY'), 'harry potter', 'pending'); 
+INSERT INTO borrower2 (roll_no, name, dateofissue, name_of_book, status) 
+VALUES (4, 'Prachi', TO_DATE('26-08-2024', 'DD-MM-YYYY'), 'silent patient', 'pending'); 
+INSERT INTO borrower2 (roll_no, name, dateofissue, name_of_book, status) 
+VALUES (5, 'Sejal', TO_DATE('09-09-2024', 'DD-MM-YYYY'), 'xyz', 'pending'); 
+select * from borrower2; 
+DECLARE 
+BEGIN 
+i_roll_no NUMBER; 
+name_of_book VARCHAR2(25); 
+no_of_days NUMBER; 
+return_date DATE := TO_DATE(SYSDATE,'DD-MM-YYYY'); 
+temp NUMBER; 
+doi DATE; 
+f
+ ine NUMBER; 
+i_roll_no := &i_roll_no; 
+name_of_book := '&nameofbook'; --dbms_output.put_line(return_date); 
+SELECT to_date(borrower2.dateofissue,'DD-MM-YYYY') INTO doi FROM borrower2 WHERE borrower2.roll_no = i_roll_no AND borrower2.name_of_book = name_of_book; 
+no_of_days := return_date-doi; 
+dbms_output.put_line(no_of_days); 
+IF (no_of_days >15 AND no_of_days <=30) THEN 
+f
+ ine := 5*no_of_days; 
+ELSIF (no_of_days>30 ) THEN 
+temp := no_of_days-30; 
+f
+ ine := 150 + temp*50; 
+END IF; 
+dbms_output.put_line(fine); 
+INSERT INTO fine1 VALUES(i_roll_no,return_date,fine); 
+UPDATE borrower2 SET status = 'RETURNED' WHERE borrower2.roll_no = i_roll_no; 
+END; 
+/ 
+select * from borrower2; 
+select * from fine1; 
+ 
+ 
+ 
+ 
+ 
+ 
+ CHIT 7
+
+Stored Procedure : create stored procedure to calculate fine of students. 
+1. Borrower (Roll_no, Name, DateofIssue, NameofBook, Status) 
+2. Fine(Roll_no,Date,Amt) 
+ Accept Roll_no and Name of Book from user. 
+ Check the number of days (from date of issue). 
+ If days are between 15 to 30 then fine amount will be Rs. 5 per day. 
+ If no. of days > 30, per day fine will be Rs 50 per day and for days less than 30, Rs. 5 per day. 
+ After submitting the book, status will change from I to R. 
+ If condition of fine is true, then details will be stored into fine table. 
+ Also handles the exception by named exception handler 
+
+DELIMITER //
+
+CREATE PROCEDURE calculate_fine(IN p_Roll_no INT, IN p_NameofBook VARCHAR(255))
+BEGIN
+    DECLARE v_DateofIssue DATE;
+    DECLARE v_Status CHAR(1);
+    DECLARE v_OverdueDays INT;
+    DECLARE v_FineAmt DECIMAL(10, 2);
+    DECLARE v_CurrentDate DATE;
+    
+    -- Named Exception Handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        -- Handle any SQL exceptions that occur during execution
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An error occurred while calculating fine.';
+    END;
+
+    -- Start transaction
+    START TRANSACTION;
+    
+    -- Fetch DateofIssue and Status from Borrower table
+    SELECT DateofIssue, Status INTO v_DateofIssue, v_Status 
+    FROM Borrower 
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+
+    -- Check if book is already returned
+    IF v_Status = 'R' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Book is already returned.';
+    END IF;
+
+    -- Calculate overdue days
+    SET v_CurrentDate = CURDATE();
+    SET v_OverdueDays = DATEDIFF(v_CurrentDate, v_DateofIssue);
+
+    -- Calculate fine amount based on overdue days
+    IF v_OverdueDays BETWEEN 15 AND 30 THEN
+        SET v_FineAmt = v_OverdueDays * 5;
+    ELSEIF v_OverdueDays > 30 THEN
+        SET v_FineAmt = 15 * 5 + (v_OverdueDays - 30) * 50;
+    ELSE
+        SET v_FineAmt = 0; -- No fine if overdue is less than 15 days
+    END IF;
+
+    -- Insert into Fine table if fine amount is applicable
+    IF v_FineAmt > 0 THEN
+        INSERT INTO Fine (Roll_no, Date, Amt) VALUES (p_Roll_no, v_CurrentDate, v_FineAmt);
+    END IF;
+
+    -- Update the status to 'R' in Borrower table
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+
+    -- Commit transaction
+    COMMIT;
+END //
+
+DELIMITER ;
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

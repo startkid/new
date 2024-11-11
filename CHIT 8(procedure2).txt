@@ -1,0 +1,69 @@
+-- Create Stud_Marks table
+CREATE TABLE Stud_Marks (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR2(50),
+    Total_Marks INT CHECK (Total_Marks BETWEEN 0 AND 1500)
+);
+
+-- Create Result table
+CREATE TABLE Result (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR2(50),
+    Class VARCHAR2(20)
+);
+
+-- Insert sample data into Stud_Marks
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks) VALUES (1, 'Alice', 1450);
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks) VALUES (2, 'Bob', 980);
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks) VALUES (3, 'Charlie', 870);
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks) VALUES (4, 'David', 825);
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks) VALUES (5, 'Eve', 1010);
+
+-- Create Procedure for Categorization
+CREATE OR REPLACE PROCEDURE proc_grade(
+    p_roll_no IN Stud_Marks.RollNo%TYPE
+)
+AS
+    v_name Stud_Marks.Name%TYPE;
+    v_total_marks Stud_Marks.Total_Marks%TYPE;
+    v_class VARCHAR2(20);
+    
+    STUDENT_NOT_FOUND EXCEPTION;
+    
+BEGIN
+    -- Fetch student's name and total marks
+    SELECT Name, Total_Marks INTO v_name, v_total_marks
+    FROM Stud_Marks
+    WHERE RollNo = p_roll_no;
+
+    -- Determine the grade based on total marks
+    IF v_total_marks BETWEEN 990 AND 1500 THEN
+        v_class := 'Distinction';
+    ELSIF v_total_marks BETWEEN 900 AND 989 THEN
+        v_class := 'First Class';
+    ELSIF v_total_marks BETWEEN 825 AND 899 THEN
+        v_class := 'Higher Second Class';
+    ELSE
+        v_class := 'No Category';
+    END IF;
+
+    -- Insert result into Result table
+    INSERT INTO Result (RollNo, Name, Class)
+    VALUES (p_roll_no, v_name, v_class);
+
+    DBMS_OUTPUT.PUT_LINE('Grade categorization successfully completed.');
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE STUDENT_NOT_FOUND;
+    WHEN STUDENT_NOT_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No record found for the provided RollNo.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END proc_grade;
+/
+SET SERVEROUTPUT ON;
+BEGIN
+    proc_grade(1);  -- Replace with the RollNo you want to test
+END;
+/
