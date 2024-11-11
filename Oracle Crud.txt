@@ -1,0 +1,112 @@
+package sample;
+
+import java.sql.*;
+
+public class OracleConnectivity {
+    private static final String URL = "jdbc:oracle:thin:@localhost:1521:xe"; // Replace with your DB URL
+    private static final String USERNAME = "your_username"; // Replace with your DB username
+    private static final String PASSWORD = "your_password"; // Replace with your DB password
+    private Connection connection;
+
+    public OracleConnectivity() {
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            System.out.println("Connected to Oracle Database!");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // CREATE operation
+    public void createRecord(String name, int age) {
+        String sql = "INSERT INTO your_table (name, age) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setInt(2, age);
+            int rowsInserted = statement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("A new record was inserted successfully!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // READ operation
+    public void readRecords() {
+        String sql = "SELECT * FROM your_table";
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                int age = resultSet.getInt("age");
+                System.out.println("Name: " + name + ", Age: " + age);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // UPDATE operation
+    public void updateRecord(int id, String name, int age) {
+        String sql = "UPDATE your_table SET name = ?, age = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setInt(2, age);
+            statement.setInt(3, id);
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("An existing record was updated successfully!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // DELETE operation
+    public void deleteRecord(int id) {
+        String sql = "DELETE FROM your_table WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            int rowsDeleted = statement.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("A record was deleted successfully!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Close connection
+    public void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Connection closed!");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        OracleConnectivity db = new OracleConnectivity();
+
+        // Create a record
+        db.createRecord("John Doe", 25);
+
+        // Read records
+        db.readRecords();
+
+        // Update a record
+        db.updateRecord(1, "Jane Doe", 30);
+
+        // Delete a record
+        db.deleteRecord(1);
+
+        // Close the connection
+        db.closeConnection();
+    }
+}
